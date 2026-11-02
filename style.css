@@ -1,0 +1,921 @@
+:root {
+    --primaria: #004d80;
+    --primaria-hover: #003359;
+    --secundaria: #48cae4;
+    --fundo: #f4f7f9;
+    --texto: #2c3e50;
+    --branco: #ffffff;
+    --borda: #cbd5e1;
+    --alerta: #e63946;
+    
+    --card-azul-bg: #e0f2fe; --card-azul-icon: #0284c7;
+    --card-verde-bg: #dcfce7; --card-verde-icon: #16a34a;
+    --card-laranja-bg: #ffedd5; --card-laranja-icon: #ea580c;
+    --card-roxo-bg: #f3e8ff; --card-roxo-icon: #9333ea;
+    
+    --classe1: #10b981; --classe2: #f59e0b;
+    --classe3: #f97316; --classe4: #ef4444;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background-color: var(--fundo); color: var(--texto); line-height: 1.6; padding-top: 0; }
+
+/* =========================================================================
+   MENU LATERAL RETRÁTIL (CONCEITO 1 - LIMPO E MODERNO)
+========================================================================= */
+.btn-hamburguer {
+    position: fixed; top: 15px; left: 15px; z-index: 2001;
+    background: #ffffff; color: var(--primaria);
+    border: 1px solid var(--borda); border-radius: 8px;
+    padding: 10px; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+}
+.btn-hamburguer:hover {
+    background: var(--card-azul-bg);
+    transform: scale(1.05);
+}
+
+.overlay-menu {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 20, 40, 0.4); backdrop-filter: blur(2px);
+    z-index: 1999; opacity: 0; visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.overlay-menu.ativo { opacity: 1; visibility: visible; }
+
+.sidebar {
+    position: fixed; top: 0; left: -360px;
+    width: 320px; height: 100vh; background: #ffffff;
+    z-index: 2002; /* Aumentado para 2002 para cobrir o botão hambúrguer ao abrir */
+    display: flex; flex-direction: column;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+}
+.sidebar.aberta { left: 0; }
+
+.sidebar-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 24px 20px 20px 20px;
+    border-bottom: 1px solid var(--fundo); background: #ffffff;
+}
+.sidebar-titles { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-title { color: var(--primaria); font-size: 1.25rem; font-weight: 800; line-height: 1.2; margin: 0; }
+.sidebar-subtitle { color: #64748b; font-size: 0.78rem; font-weight: 500; line-height: 1.3; }
+
+.btn-fechar {
+    background: transparent; color: #94a3b8; border: none;
+    font-size: 1.5rem; cursor: pointer; padding: 0 5px; margin-top: -5px;
+    transition: color 0.2s;
+}
+.btn-fechar:hover { color: var(--alerta); }
+
+.sidebar-nav { padding: 20px 15px; display: flex; flex-direction: column; gap: 6px; }
+.btn-menu-lateral {
+    display: flex; align-items: center; gap: 14px;
+    background: transparent; color: var(--texto);
+    border: none; padding: 14px 16px;
+    font-size: 1.05rem; font-weight: 500;
+    border-radius: 10px; cursor: pointer;
+    transition: all 0.2s ease; text-align: left; width: 100%;
+}
+.btn-menu-lateral svg { transition: stroke 0.2s ease; color: var(--primaria); opacity: 0.8; }
+.btn-menu-lateral:hover {
+    background: var(--card-azul-bg); color: var(--primaria);
+    transform: translateX(4px);
+}
+.btn-menu-lateral:hover svg { opacity: 1; }
+
+/* Item de Menu Ativo */
+.btn-menu-lateral.ativo {
+    background: var(--card-azul-bg);
+    color: var(--primaria);
+    border-left: 4px solid var(--primaria);
+    font-weight: 700;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.btn-menu-lateral.ativo svg { opacity: 1; stroke-width: 2.5; }
+
+/* Ajustes Responsivos da Sidebar */
+@media (max-width: 768px) {
+    .sidebar { width: 85%; max-width: 320px; left: -100%; }
+}
+
+/* Layout Base */
+.tela { display: none; min-height: 100vh; padding-bottom: 40px; }
+.tela.ativa { display: block; }
+.container { max-width: 1000px; margin: 0 auto; padding: 75px 20px 30px 20px; width: 100%; }
+.mt-10 { margin-top: 10px; } .mt-20 { margin-top: 20px; }
+
+/* =========================================================================
+   TELA INICIAL E CAPA (Controlo PC vs Telemóvel e Botões)
+========================================================================= */
+#tela-inicio.ativa {
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    width: 100vw !important;
+}
+
+.capa-wrapper-central {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    position: relative !important;
+}
+
+.capa-container {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+}
+
+/* 1. COMPORTAMENTO PADRÃO (PC) */
+.capa-mobile {
+    display: none !important; /* Esconde a capa do telemóvel no PC */
+}
+
+.capa-pc {
+    display: block !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    object-fit: fill !important;
+}
+
+/* =========================================================================
+   ÁREAS CLICÁVEIS (BOTÕES) E CONFIGURAÇÕES POR TIPO DE ECRÃ
+   --> Esta é a secção que garante que os botões funcionam! <--
+========================================================================= */
+.area-click {
+    position: absolute !important;
+    z-index: 100 !important; /* Puxa os botões para a frente da imagem, tornando-os clicáveis */
+    cursor: pointer !important;
+    background-color: transparent;
+    border-radius: 20px;
+}
+
+/* --- PC / TABLET --- */
+@media (min-width: 769px) {
+    .area-avaliacao { top: 52%; height: 25%; left: 5%; width: 28%; }
+    .area-videos    { top: 52%; height: 25%; left: 36%; width: 28%; }
+    .area-planos    { top: 52%; height: 25%; left: 67%; width: 28%; }
+}
+
+/* --- SMARTPHONE --- */
+@media (max-width: 768px) {
+    #tela-inicio.ativa {
+        height: calc(100vh - 80px) !important; /* Desconta o menu duplo do telemóvel */
+    }
+
+    .capa-pc {
+        display: none !important; /* Esconde a capa do PC */
+    }
+    
+    .capa-mobile {
+        display: block !important; /* Mostra a capa do telemóvel (capa_smart) */
+        width: 100vw !important;
+        height: 100% !important;
+        object-fit: fill !important; /* Encaixa a arte perfeitamente */
+    }
+
+    /* Posição dos botões no telemóvel */
+    .area-avaliacao { top: 38%; height: 16%; left: 5%; width: 90%; }
+    .area-videos    { top: 55.5%; height: 16%; left: 5%; width: 90%; }
+    .area-planos    { top: 73%; height: 16%; left: 5%; width: 90%; }
+}
+
+/* --- REPOSITÓRIO DE PLANOS DE AULA (PROFISSIONAL) --- */
+.container-planos { max-width: 1100px !important; }
+
+.grid-planos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 25px;
+}
+
+.plano-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+.plano-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 5px; height: 100%;
+    background: linear-gradient(to bottom, var(--primaria), var(--secundaria));
+}
+
+.plano-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 30px -4px rgba(0, 77, 128, 0.12);
+    border-color: var(--secundaria);
+}
+
+.plano-card h4 {
+    color: var(--primaria);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.plano-card p {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 22px;
+    flex-grow: 1;
+}
+
+.btn-baixar-plano {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #f8fafc;
+    color: var(--primaria);
+    padding: 12px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: 1px solid #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+.btn-baixar-plano:hover {
+    background: var(--primaria);
+    color: white;
+    border-color: var(--primaria);
+    box-shadow: 0 4px 12px rgba(0, 77, 128, 0.2);
+}
+
+/* --- TRILHA DE VÍDEOS DE FORMAÇÃO (MODERNO) --- */
+.container-formacao { max-width: 1000px !important; }
+
+.video-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 32px;
+    margin-bottom: 35px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.video-card h3 {
+    color: var(--primaria);
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.video-topicos-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.topico-tag {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #0f172a;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+}
+
+.atividade-reflexao {
+    background: #fffbeb;
+    border-left: 5px solid #f59e0b;
+    padding: 18px 22px;
+    margin-top: 22px;
+    border-radius: 0 12px 12px 0;
+    font-size: 0.98rem;
+    color: #92400e;
+    line-height: 1.6;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.05);
+}
+
+/* Certificado */
+.bloco-certificado { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 16px; padding: 30px; text-align: center; }
+.bloco-certificado h3 { color: #16a34a; margin-bottom: 12px; font-size: 1.4rem; }
+
+/* Tipografia PAR */
+h2 { color: var(--primaria); margin-bottom: 20px; font-weight: 700; border-bottom: 2px solid var(--borda); padding-bottom: 12px; font-size: 1.8rem; }
+.subtitulo-cientifico { font-size: 0.9rem; color: #64748b; font-style: italic; margin-bottom: 20px; }
+
+/* Blocos Pedagógicos */
+.bloco-pedagogico { display: flex; align-items: flex-start; padding: 18px; border-radius: 14px; margin-bottom: 18px; gap: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+.bloco-icone { font-size: 1.8rem; background: white; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; border-radius: 50%; flex-shrink: 0; box-shadow: 0 3px 6px rgba(0,0,0,0.06); }
+.bloco-conteudo h4 { font-size: 1.05rem; margin-bottom: 6px; font-weight: 700; }
+.bloco-conteudo p { font-size: 0.96rem; line-height: 1.6; color: #334155; }
+.bloco-pedagogico.azul { background-color: var(--card-azul-bg); border-left: 5px solid var(--card-azul-icon); } .bloco-pedagogico.azul h4 { color: var(--card-azul-icon); }
+.bloco-pedagogico.verde { background-color: var(--card-verde-bg); border-left: 5px solid var(--card-verde-icon); } .bloco-pedagogico.verde h4 { color: var(--card-verde-icon); }
+.bloco-pedagogico.laranja { background-color: var(--card-laranja-bg); border-left: 5px solid var(--card-laranja-icon); } .bloco-pedagogico.laranja h4 { color: var(--card-laranja-icon); }
+.bloco-pedagogico.roxo { background-color: var(--card-roxo-bg); border-left: 5px solid var(--card-roxo-icon); } .bloco-pedagogico.roxo h4 { color: var(--card-roxo-icon); }
+
+/* Grid Opções PAR */
+.instrucao-selecao { color: var(--primaria); text-align: center; font-size: 1.15rem; margin: 30px 0 15px 0; font-weight: 700; }
+.grid-opcoes-imagens { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.card-opcao { background: var(--branco); border: 2px solid var(--borda); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; }
+.card-opcao:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: var(--primaria); }
+.card-opcao.selecionada { border-color: var(--primaria); border-width: 3px; box-shadow: 0 0 0 4px rgba(0, 77, 128, 0.15); }
+.conteudo-opcao { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.texto-opcao { font-size: 0.98rem; color: #475569; margin-bottom: 15px; line-height: 1.5; }
+.tag-pontos { display: inline-block; padding: 6px 14px; border-radius: 8px; font-weight: bold; text-align: center; font-size: 1.1rem; }
+.tag-5 { background: #dcfce7; color: #15803d; } .tag-3 { background: #fef9c3; color: #a16207; }
+.tag-2 { background: #ffedd5; color: #c2410c; } .tag-0 { background: #fee2e2; color: #b91c1c; }
+@media (max-width: 600px) { .grid-opcoes-imagens { grid-template-columns: 1fr; } }
+
+/* Botões Gerais */
+button { border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+.btn-grande { width: 100%; padding: 16px; font-size: 1.1rem; }
+.btn-secundario { width: 100%; padding: 14px; background: #e2e8f0; color: #475569; }
+button.principal { background-color: var(--primaria); color: var(--branco); }
+button.principal:hover { background-color: var(--primaria-hover); }
+.btn-aviso { background-color: #f59e0b; color: white; }
+.btn-sucesso { background-color: #10b981; color: white; }
+.navegacao-botoes { display: flex; justify-content: space-between; gap: 15px; }
+.btn-nav { flex: 1; padding: 15px; font-size: 1.1rem; border: none; border-radius: 10px; font-weight:bold; }
+.btn-nav#btn-anterior { background: #e2e8f0; color: #475569; }
+
+/* Header Fixado Parâmetros */
+.header-par { display: flex; justify-content: space-between; padding: 15px 20px; background: var(--branco); box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: bold; color: var(--primaria); position: sticky; top: 46px; z-index: 10; border-bottom: 1px solid var(--borda); }
+.barra-progresso-container { height: 6px; background: #e2e8f0; width: 100%; }
+#barra-progresso { height: 100%; background: var(--primaria); width: 0%; transition: width 0.3s; }
+
+/* Inputs e Form */
+.form-group { margin-bottom: 16px; text-align: left; }
+label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
+input, textarea { width: 100%; padding: 14px; border: 1px solid var(--borda); border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+input:focus, textarea:focus { border-color: var(--primaria); box-shadow: 0 0 0 3px rgba(0, 77, 128, 0.1); }
+
+/* Mapa */
+#mapa { width: 100%; height: 380px; border-radius: 14px; border: 1px solid var(--borda); margin-bottom: 15px; z-index: 1; }
+.coordenadas-info { background: white; border: 1px solid var(--borda); border-radius: 10px; padding: 16px; }
+
+/* Resultados e Textos */
+.texto-informativo { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 6px 20px rgba(0,0,0,0.04); margin-top: 20px; border: 1px solid var(--borda); }
+.texto-informativo p { margin-bottom: 16px; }
+.erro { color: var(--alerta); font-weight: bold; margin-top: 10px; text-align: center; }
+.escondido { display: none !important; }
+.placar-final { background: white; padding: 24px; border-radius: 16px; text-align: center; margin-bottom: 20px; border: 1px solid var(--borda); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.nota-destaque { font-size: 2.8rem; font-weight: bold; color: var(--primaria); margin-top: 5px; }
+.classificacao-final { padding: 28px; border-radius: 16px; text-align: center; margin-bottom: 20px; color: white; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+.classe-texto { font-size: 1.9rem; font-weight: bold; margin: 10px 0; }
+.tabela-resumo { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--borda); margin-bottom: 20px; }
+.tabela-resumo th, .tabela-resumo td { padding: 14px 16px; border-bottom: 1px solid var(--borda); text-align: left; }
+
+/* Oculta todas as telas por padrão */
+.tela {
+    display: none;
+}
+
+/* Mostra apenas a tela que possui a classe ativa */
+.tela.ativa {
+    display: block;
+}
+
+/* =========================================================================
+   ESTILOS DA TELA "MAPEAMENTO DO RIO"
+========================================================================= */
+
+/* Mapa Responsivo (Iframe) */
+.mapa-responsivo-container {
+    position: relative;
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    background: #e2e8f0;
+    /* Ratio para manter proporção. Ajusta altura automaticamente */
+    padding-bottom: 56.25%; /* Ratio 16:9 para Desktop */
+    height: 0;
+}
+.mapa-responsivo-container iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+}
+
+@media (max-width: 768px) {
+    .mapa-responsivo-container {
+        padding-bottom: 100%; /* Ratio 1:1 (mais quadrado) no Telemóvel */
+    }
+}
+
+/* Como Utilizar o Mapeamento (4 Passos) */
+.grid-passos-mapa {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.passo-card-mapa {
+    background: #f8fafc;
+    border-top: 4px solid var(--primaria);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+.passo-numero {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--card-azul-bg);
+    -webkit-text-stroke: 1px var(--primaria);
+    line-height: 1;
+    margin-bottom: 10px;
+}
+.passo-card-mapa h4 {
+    color: var(--primaria);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+.passo-card-mapa p {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+/* Cartões de Registros Socioambientais */
+.grid-registros-mapa {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.registro-card {
+    background: #ffffff;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+.registro-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: #e2e8f0; /* Fundo enquanto não tem imagem */
+}
+.registro-conteudo {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.registro-conteudo h4 {
+    color: var(--primaria);
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+.registro-conteudo p {
+    font-size: 0.95rem;
+    color: #334155;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+.registro-par {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    color: #166534;
+    border-radius: 0 6px 6px 0;
+}
+
+/* Fluxo: Do Território ao PAR */
+.fluxo-pedagogico-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: #f4f7f9;
+    padding: 30px 20px;
+    border-radius: 16px;
+}
+.fluxo-item {
+    background: #ffffff;
+    border: 1px solid var(--borda);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #475569;
+    text-align: center;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.fluxo-seta {
+    color: var(--primaria);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+.fluxo-item.destaque {
+    background: var(--card-azul-bg);
+    color: var(--primaria);
+    border-color: var(--primaria);
+}
+.fluxo-item.final {
+    background: var(--primaria);
+    color: #ffffff;
+    border: none;
+}
+
+/* =========================================================================
+   ESTILOS INSTITUCIONAIS — PÁGINA TERRITÓRIO
+========================================================================= */
+.territorio-page-wrapper {
+    background-color: #ffffff;
+    color: var(--texto);
+    padding-bottom: 60px;
+}
+
+.territorio-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+.max-width-800 {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.territorio-section {
+    padding: 60px 0;
+}
+
+.territorio-bg-light {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.territorio-bg-primary {
+    background-color: var(--primaria);
+    color: white;
+    padding: 80px 0;
+}
+
+.territorio-section-header {
+    margin-bottom: 40px;
+}
+
+.territorio-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: var(--primaria);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+}
+
+.territorio-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--primaria);
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.territorio-lead {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #334155;
+    margin-bottom: 30px;
+}
+
+.territorio-subtitle {
+    color: #64748b;
+    font-size: 1.05rem;
+}
+
+.territorio-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.territorio-text-block h2 {
+    font-size: 2rem;
+    color: var(--primaria);
+    margin-bottom: 20px;
+    font-weight: 700;
+    border: none;
+    padding: 0;
+}
+
+.territorio-text-block p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #475569;
+    margin-bottom: 16px;
+}
+
+.territorio-img-fluid {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    object-fit: cover;
+}
+
+.territorio-img-caption {
+    display: block;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-top: 10px;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Galeria de Cartões */
+.territorio-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.territorio-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.territorio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+}
+
+.territorio-card-img-wrap {
+    height: 180px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.territorio-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.territorio-card:hover .territorio-card-img-wrap img {
+    transform: scale(1.03);
+}
+
+.territorio-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.territorio-card-body h3 {
+    font-size: 1.1rem;
+    color: var(--primaria);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.territorio-card-body p {
+    font-size: 0.92rem;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Chamada Visual (Rio e Cidade) */
+.territorio-callout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.territorio-callout-item {
+    background: #ffffff;
+    border-left: 4px solid var(--secundaria);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.territorio-callout-item strong {
+    display: block;
+    color: var(--primaria);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.territorio-callout-item span {
+    font-size: 0.95rem;
+    color: #334155;
+}
+
+/* Caixa de Observação */
+.territorio-box-checklist {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 22px;
+    margin-top: 25px;
+}
+
+.territorio-box-checklist h4 {
+    color: #166534;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.territorio-box-checklist ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #14532d;
+}
+
+.territorio-box-checklist li {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Fluxograma Simples */
+.territorio-fluxo-simples {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.fluxo-step {
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: var(--primaria);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.fluxo-step.destaque {
+    background: var(--primaria);
+    color: white;
+    border-color: var(--primaria);
+}
+
+.fluxo-arrow {
+    color: #94a3b8;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* =========================================================================
+   AJUSTE DO VÍDEO VERTICAL (TERRITÓRIO)
+========================================================================= */
+.territorio-video-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 360px; /* Reduz a largura máxima para se adaptar ao formato vertical */
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0f172a;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.territorio-html5-video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.territorio-video-legenda {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Botões Institucionais */
+.territorio-btn-primary {
+    display: inline-block;
+    background: var(--primaria);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 77, 128, 0.2);
+    transition: background 0.2s, transform 0.1s;
+}
+
+.territorio-btn-primary:hover {
+    background: var(--primaria-hover);
+    transform: translateY(-2px);
+}
+
+.territorio-btn-white {
+    display: inline-block;
+    background: white;
+    color: var(--primaria);
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.territorio-btn-white:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+}
+
+/* Responsividade Mobile */
+@media (max-width: 768px) {
+    .territorio-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    .territorio-title {
+        font-size: 1.9rem;
+    }
+    .territorio-section {
+        padding: 40px 0;
+    }
+    .territorio-fluxo-simples {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .fluxo-arrow {
+        transform: rotate(90deg);
+        margin: 4px 0;
+    }
+}
+/* =========================================================================
+   CORREÇÃO: ESPAÇO PARA O BOTÃO DO MENU NO TELEMÓVEL (PÁGINA TERRITÓRIO)
+========================================================================= */
+@media (max-width: 768px) {
+    .territorio-hero {
+        padding-top: 70px;
+    }
+}

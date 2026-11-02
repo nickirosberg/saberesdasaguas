@@ -1,0 +1,16 @@
+{
+  "name": "PAR - Rio Jaguaribe",
+  "short_name": "PAR Jaguaribe",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7f9",
+  "theme_color": "#004d80",
+  "icons": [
+    {
+      "src": "img/banner.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

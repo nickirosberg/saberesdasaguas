@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAR - Rio Jaguaribe (Plataforma Educacional)</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet CSS para o Mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="manifest" href="manifest.json">
+    <!-- Biblioteca jsPDF para geração de certificados -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+   <!-- BOTAO FLUTUANTE HAMBURGUER -->
+    <button id="btn-hamburguer" class="btn-hamburguer" onclick="toggleMenuLateral()" aria-label="Abrir menu de navegação">
+        <svg viewBox="0 0 24 24" width="26" height="26" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+
+    <!-- OVERLAY DE FUNDO (Cobre a tela e fecha ao clicar) -->
+    <div id="overlay-menu" class="overlay-menu" onclick="toggleMenuLateral()"></div>
+
+    <!-- MENU LATERAL RETRÁTIL (CONCEITO 1) -->
+    <nav id="menu-lateral" class="sidebar" role="navigation" aria-hidden="true">
+        <div class="sidebar-header">
+            <div class="sidebar-titles">
+                <h2 class="sidebar-title">SABERES DAS ÁGUAS</h2>
+                <span class="sidebar-subtitle">Educação Ambiental e Educação Hídrica</span>
+            </div>
+            <button class="btn-fechar" onclick="toggleMenuLateral()" aria-label="Fechar menu">✕</button>
+        </div>
+        <div class="sidebar-nav">
+            <button class="btn-menu-lateral ativo" onclick="navegarEMeFechar('tela-inicio', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Início
+            </button>
+           <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-sobre', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                Sobre / Objetivo
+            </button>
+            
+            <!-- NOVO BOTÃO: TERRITÓRIO -->
+            <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-territorio', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                Território
+            </button>
+            <!-- FIM DO NOVO BOTÃO -->
+
+            <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-referencias', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                Referências
+            </button>
+            <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-tabela-classificacao', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                Tabela de Classes
+            </button>
+            <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-formacao', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                Formação (Vídeos)
+            </button>
+            <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-planos', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Planos de Aula
+            </button>
+            <button class="btn-menu-lateral" onclick="navegarEMeFechar('tela-identificacao', this)">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                Avaliação
+            </button>
+        </div>
+    </nav>
+
+    <!-- TELA 1: INICIAL (CAPA) -->
+    <div id="tela-inicio" class="tela ativa">
+        <div class="capa-wrapper-central">
+            <div class="capa-container">
+                <!-- Imagem do PC -->
+                <img src="img/capa_pc.png" class="capa-pc" alt="Capa PC">
+                
+                <!-- Imagem do Telemóvel -->
+                <img src="img/capa_smart.png" class="capa-mobile" alt="Capa Telemóvel">
+                
+                <!-- Áreas clicáveis (Botões) -->
+                <div class="area-click area-avaliacao" onclick="mudarTela('tela-identificacao')" title="Ir para Avaliação"></div>
+                <div class="area-click area-videos" onclick="mudarTela('tela-formacao')" title="Ir para Vídeos de Formação"></div>
+                <div class="area-click area-planos" onclick="mudarTela('tela-planos')" title="Ir para Planos de Aula"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 2: FORMAÇÃO (VÍDEOS, QUESTIONÁRIO E CERTIFICADO) -->
+    <div id="tela-formacao" class="tela">
+        <div class="container container-formacao">
+            <h2>TRILHA DE VÍDEOS DA FORMAÇÃO</h2>
+            
+           
+            
+            <div id="painel-admin-geral" class="caixa-destaque escondido mt-10" style="margin-bottom: 25px; border-left: 5px solid var(--primaria);">
+                <div id="admin-login-box">
+                    <h3 style="color: var(--primaria); margin-bottom: 8px;">Acesso Restrito ao Administrador</h3>
+                    <div class="form-group"><input type="password" id="senha-admin" placeholder="Senha de acesso" style="max-width: 300px;"></div>
+                    <button class="btn-grande principal" onclick="verificarSenhaAdmin()" style="max-width: 200px; padding: 10px;">🔓 Entrar</button>
+                </div>
+
+                <div id="admin-conteudo-protegido" class="escondido">
+                    <h3 style="color: var(--primaria); margin-bottom: 12px; border-bottom: 2px solid var(--borda); padding-bottom: 8px;">Configurações</h3>
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #334155; font-size: 1rem;">1. Links dos Vídeos (YouTube)</h4>
+                        <div id="inputs-admin-videos" style="display: flex; flex-direction: column; gap: 8px; margin-top: 5px;"></div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #334155; font-size: 1rem;">2. Data e Local de Realização (Certificado)</h4>
+                        <input type="text" id="config-evento-data" placeholder="Ex: Jaguaribe - CE, 25 de Outubro de 2026" style="margin-top: 5px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #334155; font-size: 1rem;">3. Imagem da Frente do Certificado (PNG)</h4>
+                        <input type="file" id="config-img-certificado" accept="image/png" style="margin-top: 5px; padding: 6px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #334155; font-size: 1rem;">4. Imagem do Verso do Certificado (PNG)</h4>
+                        <input type="file" id="config-img-certificado-verso" accept="image/png" style="margin-top: 5px; padding: 6px;">
+                    </div>
+                    <button class="btn-grande principal mt-10" onclick="salvarConfiguracoesGerais()" style="padding: 12px;">💾 Guardar Configurações</button>
+                </div>
+            </div>
+
+            <div class="bloco-pedagogico azul">
+                <div class="bloco-icone">🎯</div>
+                <div class="bloco-conteudo">
+                    <h4>Educação Ambiental, Educação Hídrica e PAR como recurso pedagógico</h4>
+                    <p><strong>Objetivo da trilha:</strong> Oferecer conhecimentos para realizar uma leitura socioambiental do território.</p>
+                </div>
+            </div>
+
+            <div id="lista-videos-container" class="mt-20"></div>
+
+            <div class="mt-20" style="text-align: center;">
+                
+            </div>
+
+            <!-- QUESTIONÁRIO -->
+<div id="secao-avaliacao-diagnostica" class="escondido" style="margin-top: 30px; background: white; padding: 35px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.06); border-top: 6px solid #004d80;">
+    <h3 style="color:#004d80; margin-bottom: 25px; font-size: 1.4rem;">Questionário Pós-Formação</h3>
+    <form onsubmit="enviarAvaliacaoDiagnostica(event)">
+        
+        <!-- Identificação -->
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: bold; color: #334155; display: block; margin-bottom: 8px;">Nome:</label>
+            <input type="text" id="diag-nome" required style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem;">
+        </div>
+        <div style="margin-bottom: 30px;">
+            <label style="font-weight: bold; color: #334155; display: block; margin-bottom: 8px;">Formação Acadêmica:</label>
+            <input type="text" id="diag-formacao" required style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem;">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 30px;">
+
+        <!-- Bloco de Perguntas 1 a 11 (Escala de Concordância) -->
+        <div style="display: flex; flex-direction: column; gap: 25px; margin-bottom: 35px;">
+            
+            <!-- Pergunta 1 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">1. O ambiente digital apresenta organização e navegação fáceis de compreender e utilizar.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q1" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q1" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q1" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q1" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 2 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">2. Os conteúdos e orientações disponibilizados são claros e adequados à formação continuada em Educação Hídrica e Educação Ambiental.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q2" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q2" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q2" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q2" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 3 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">3. O ambiente digital apresenta conteúdos que podem ampliar os conhecimentos do professor sobre água e recursos hídricos.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q3" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q3" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q3" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q3" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 4 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">4. O ambiente digital pode auxiliar o professor a trabalhar Educação Hídrica em sua prática pedagógica.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q4" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q4" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q4" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q4" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 5 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">5. Os recursos disponibilizados favorecem o trabalho com Educação Ambiental de forma transversal nos diferentes componentes curriculares.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q5" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q5" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q5" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q5" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 6 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">6. O ambiente digital contribui para relacionar a Educação Hídrica com o território e com questões socioambientais locais.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q6" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q6" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q6" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q6" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 7 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">7. O PAR, apresentado no ambiente digital, pode ser utilizado como instrumento pedagógico para a observação e leitura socioambiental de rios com os estudantes.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q7" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q7" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q7" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q7" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 8 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">8. As orientações sobre o PAR são suficientes para compreender suas possibilidades de utilização em atividades educativas.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q8" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q8" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q8" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q8" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 9 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">9. Os planos de aula apresentam possibilidades concretas de trabalhar Educação Hídrica, Educação Ambiental e o PAR na escola.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q9" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q9" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q9" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q9" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 10 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">10. Os recursos disponibilizados podem ser utilizados por professores de diferentes componentes curriculares.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q10" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q10" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q10" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q10" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+            <!-- Pergunta 11 -->
+            <div>
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">11. De modo geral, o ambiente digital apresenta potencial para apoiar a formação continuada de professores em Educação Hídrica.</p>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                    <label><input type="radio" name="diag-q11" value="1 – Discordo totalmente" required> 1 – Discordo totalmente</label>
+                    <label><input type="radio" name="diag-q11" value="2 – Discordo"> 2 – Discordo</label>
+                    <label><input type="radio" name="diag-q11" value="3 – Concordo"> 3 – Concordo</label>
+                    <label><input type="radio" name="diag-q11" value="4 – Concordo totalmente"> 4 – Concordo totalmente</label>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pergunta 12 (Opções Próprias) -->
+        <div style="margin-bottom: 25px;">
+            <p style="font-weight: 600; color: #1e293b; margin-bottom: 10px;">12. Após conhecer o ambiente digital, você considera que ele pode ser utilizado como recurso de apoio à sua prática pedagógica?</p>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.95rem; color: #475569;">
+                <label><input type="radio" name="diag-q12" value="Não" required> Não</label>
+                <label><input type="radio" name="diag-q12" value="Pouco"> Pouco</label>
+                <label><input type="radio" name="diag-q12" value="Sim"> Sim</label>
+                <label><input type="radio" name="diag-q12" value="Sim, significativamente"> Sim, significativamente</label>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 25px;">
+
+        <h4 style="color: #004d80; margin-bottom: 20px;">Questões Abertas</h4>
+
+        <!-- Pergunta 13 -->
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: 600; color: #1e293b; display: block; margin-bottom: 8px;">13. Qual recurso ou conteúdo do ambiente digital você considerou mais útil para sua formação?</label>
+            <textarea id="diag-q13" rows="3" style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit;"></textarea>
+        </div>
+
+        <!-- Pergunta 14 -->
+        <div style="margin-bottom: 30px;">
+            <label style="font-weight: 600; color: #1e293b; display: block; margin-bottom: 8px;">14. Que melhoria, conteúdo ou recurso você sugere acrescentar ao ambiente digital?</label>
+            <textarea id="diag-q14" rows="3" style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit;"></textarea>
+        </div>
+
+        <button type="submit" style="background: #16a34a; color: white; border: none; padding: 14px 25px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 4px 6px rgba(22,163,74,0.2);">Enviar Avaliação e Liberar Certificado</button>
+    </form>
+</div>
+          
+        </div>
+    </div>
+
+    <!-- TELA 3: PLANOS DE AULA (LISTA DE CARDS) -->
+    <div id="tela-planos" class="tela">
+        <div class="container container-planos">
+            <h2>📚 Repositório de Planos de Aula</h2>
+            <p class="instrucao">Acesse sugestões de planos de aula interdisciplinares alinhados à BNCC, utilizando o PAR como recurso metodológico investigativo.</p>
+            <div class="grid-planos" id="grid-planos-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px;"></div>
+            <button class="btn-grande principal mt-20" onclick="mudarTela('tela-inicio')">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <!-- TELA 3.5: DETALHE DO PLANO (PÁGINA DINÂMICA PROFISSIONAL) -->
+    <div id="tela-detalhe-plano" class="tela">
+        <div class="container container-planos">
+            <div class="navegacao-botoes" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn-secundario" onclick="mudarTela('tela-planos')" style="padding: 10px 20px;">← Voltar aos Planos</button>
+                <button class="btn-secundario" onclick="window.print()" style="background: #e2e8f0; color: #1e293b; padding: 10px 20px; border-radius: 8px; font-weight: bold;">🖨️ Imprimir Plano</button>
+            </div>
+            <div id="conteudo-plano-detalhe"></div>
+            <button class="btn-grande principal mt-20" onclick="mudarTela('tela-planos')">Voltar ao Repositório</button>
+        </div>
+    </div>
+
+    <!-- TELA 4: IDENTIFICAÇÃO (AVALIAÇÃO) -->
+    <div id="tela-identificacao" class="tela">
+        <div class="container">
+            <h2>Identificação do Trecho (Avaliação)</h2>
+            <div class="form-group"><label>Município</label><input type="text" id="municipio"></div>
+            <div class="form-group"><label>Ponto/Trecho</label><input type="text" id="trecho"></div>
+            <div class="form-group"><label>Data da avaliação</label><input type="date" id="data"></div>
+            <div class="form-group"><label>Avaliador (Professor)</label><input type="text" id="avaliador"></div>
+            <div class="form-group"><label>Observações</label><textarea id="obs" rows="3"></textarea></div>
+            <button class="btn-grande principal" onclick="iniciarPar()">AVANÇAR PARA O MAPA</button>
+            <button class="btn-secundario mt-10" onclick="mudarTela('tela-inicio')">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <!-- TELA 5: MAPA -->
+    <div id="tela-localizacao" class="tela">
+        <div class="container container-mapa">
+            <h2>LOCALIZAÇÃO DO PONTO</h2>
+            <div id="mapa"></div>
+            <div class="coordenadas-info"><span id="txt-lat">Latitude: --</span> | <span id="txt-lng">Longitude: --</span></div>
+            <p id="msg-erro-mapa" class="erro escondido">Selecione o ponto no mapa para prosseguir.</p>
+            <div class="navegacao-botoes mt-10">
+                <button class="btn-secundario" onclick="mudarTela('tela-identificacao')">← Voltar</button>
+                <button class="btn-grande principal" onclick="continuarParaParametros()">INICIAR AVALIAÇÃO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 6: PARÂMETROS -->
+    <div id="tela-parametros" class="tela">
+        <div class="header-par"><span id="contador-parametro">Parâmetro 1 de 17</span><span id="pontuacao-acumulada-topo">Total: 0 pts</span></div>
+        <div class="barra-progresso-container"><div id="barra-progresso"></div></div>
+        <div class="container layout-educacional">
+            <h3 id="nome-parametro">Nome do Parâmetro</h3>
+            <p id="nome-cientifico" class="subtitulo-cientifico">Nome original</p>
+            <div class="bloco-pedagogico azul"><h4>O que observar?</h4><p id="texto-oque"></p></div>
+            <div class="bloco-pedagogico verde"><h4>Por que importa?</h4><p id="texto-porque"></p></div>
+            <div class="bloco-pedagogico laranja"><h4>Como observar?</h4><p id="texto-como"></p></div>
+            <h4 class="instrucao-selecao">Escolha a opção:</h4>
+            <div id="opcoes-container" class="grid-opcoes-imagens"></div>
+            <p id="msg-erro" class="erro escondido">Selecione uma opção.</p>
+            <div class="bloco-pedagogico roxo mt-20"><h4>Para discutir:</h4><p id="texto-discussao"></p></div>
+            <div class="navegacao-botoes mt-20">
+                <button class="btn-nav" id="btn-anterior" onclick="parametroAnterior()">← ANTERIOR</button>
+                <button class="btn-nav principal" id="btn-proximo" onclick="proximoParametro()">PRÓXIMO →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 7: RESULTADOS -->
+    <div id="tela-resultados" class="tela">
+        <div class="container">
+            <h2>RESULTADO DA AVALIAÇÃO</h2>
+            <div class="placar-final"><h3>Pontuação Obtida</h3><div class="nota-destaque"><span id="pontuacao-final">0</span> / 85</div></div>
+            <div class="classificacao-final" id="caixa-classificacao"><h3 id="texto-classificacao"></h3><p id="interpretacao-classificacao"></p></div>
+            <div class="resumo-resultados">
+                <table class="tabela-resumo">
+                    <tbody id="tabela-corpo"></tbody>
+                    <tfoot><tr><th>TOTAL</th><th id="tabela-total">0</th></tr></tfoot>
+                </table>
+            </div>
+            <div class="acoes-finais">
+                <button class="btn-grande btn-sucesso" onclick="salvarDiagnostico()">💾 SALVAR DIAGNÓSTICO (TXT)</button>
+                <button class="btn-grande btn-aviso mt-10" onclick="revisarAvaliacao()">REVISAR AVALIAÇÃO</button>
+                <button class="btn-grande principal mt-10" onclick="novaAvaliacao()">NOVA AVALIAÇÃO</button>
+                
+            </div>
+        </div>
+    </div>
+
+   <!-- TELA 8: SOBRE / OBJETIVO -->
+    <div id="tela-sobre" class="tela">
+        <div class="container texto-informativo">
+            <h2>Sobre o Ambiente Digital</h2>
+            <p>O <strong>Saberes das Águas</strong> é um ambiente digital de Educação Ambiental e Educação Hídrica, desenvolvido como produto educacional para apoiar a formação continuada de docentes da Educação Básica e a contextualização de práticas educativas a partir do território do Rio Jaguaribe, em Jaguaribe, Ceará.</p>
+            
+            <p>O ambiente integra o PAR Educacional, uma versão sistematizada do Protocolo de Avaliação Rápida (PAR) adaptada à abordagem pedagógica e ao contexto de um rio perenizado no semiárido, a recursos formativos, vídeos, atividades, materiais contextualizadores e propostas de práticas educativas.</p>
+            
+            <p>O PAR Educacional possibilita a observação e a leitura socioambiental do ambiente aquático por meio de parâmetros relacionados às margens, ao corpo d’água e ao entorno, favorecendo a problematização de questões relacionadas à água, aos recursos hídricos, ao território e às relações entre sociedade e ambiente.</p>
+            
+            <h3 style="color: var(--primaria); margin-top: 25px; margin-bottom: 12px; font-size: 1.4rem;">Objetivo</h3>
+            <p>Disponibilizar um ambiente digital que integre o PAR Educacional, conteúdos formativos, recursos multimídia, atividades e propostas pedagógicas, contribuindo para a formação continuada de docentes e para a elaboração de práticas de Educação Ambiental e Educação Hídrica contextualizadas no território do Rio Jaguaribe.</p>
+            
+            <div style="background: #fffbeb; border-left: 5px solid #f59e0b; padding: 18px 22px; margin-top: 25px; border-radius: 0 12px 12px 0;">
+                <p style="margin: 0; color: #92400e; font-size: 0.95rem; line-height: 1.6;">
+                    <strong>Nota Importante:</strong> O PAR Educacional constitui um recurso pedagógico de observação, registro, interpretação e discussão socioambiental, não substituindo análises laboratoriais, monitoramento especializado ou instrumentos institucionais de avaliação e gestão dos recursos hídricos.
+                </p>
+            </div>
+
+            <button class="btn-grande principal mt-20" onclick="mudarTela('tela-inicio')">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <!-- TELA: TERRITÓRIO (INSTITUCIONAL) -->
+    <div id="tela-territorio" class="tela">
+        <div class="territorio-page-wrapper">
+            
+            <!-- SEÇÃO 1 – HERO INSTITUCIONAL -->
+            <section class="territorio-hero">
+                <div class="territorio-container">
+                    <div class="territorio-hero-content">
+                        <span class="territorio-badge">Contexto Territorial</span>
+                        <h1 class="territorio-title">O território do Rio Jaguaribe</h1>
+                        <p class="territorio-lead">
+                            O Rio Jaguaribe integra paisagens, comunidades, atividades humanas e diferentes formas de relação com a água. Em Jaguaribe, compreender esse território significa observar como o rio se relaciona com a cidade, a vegetação, as margens e as intervenções humanas.
+                        </p>
+                        <div class="territorio-hero-actions">
+                            <a href="#territorio-vivo" class="territorio-btn-primary" onclick="event.preventDefault(); document.getElementById('territorio-vivo').scrollIntoView({behavior: 'smooth'});">
+                                Explorar o território ↓
+                            </a>
+                        </div>
+                    </div>
+                    <div class="territorio-hero-image-box">
+                        <img src="img/mapeamento/Ponte de concreto sobre rio sereno (1).png" alt="Ponte de concreto sobre o Rio Jaguaribe em Jaguaribe, Ceará" loading="lazy" class="territorio-img-fluid" onerror="this.src='img/ponte.png';">
+                        <span class="territorio-img-caption">Ponte de concreto sobre o Rio Jaguaribe — Trecho urbano, Jaguaribe (CE).</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO – UM TERRITÓRIO VIVO -->
+            <section id="territorio-vivo" class="territorio-section territorio-bg-light">
+                <div class="territorio-container territorio-grid-2">
+                    <div class="territorio-text-block">
+                        <h2>Um território marcado pela presença da água</h2>
+                        <p>
+                            O território do Rio Jaguaribe reúne diferentes paisagens e formas de ocupação. Ao longo do trecho observado em Jaguaribe, a presença da água se relaciona com a vegetação, as margens, as estruturas construídas e a ocupação urbana.
+                        </p>
+                        <p>
+                            Essas características permitem compreender o rio para além de sua dimensão física, reconhecendo-o como parte da dinâmica social, ambiental e territorial do município.
+                        </p>
+                    </div>
+                    <div class="territorio-image-block">
+                        <img src="img/t2.jpg" alt="Vegetação e margem do Rio Jaguaribe" loading="lazy" class="territorio-img-fluid" onerror="this.src='img/capa_pc.png';">
+                    </div>
+                </div>
+            </section>
+
+            <!-- GALERIA – DIFERENTES PAISAGENS DO TERRITÓRIO -->
+            <section class="territorio-section">
+                <div class="territorio-container">
+                    <div class="territorio-section-header text-center">
+                        <h2>Diferentes paisagens do território</h2>
+                        <p class="territorio-subtitle">Registros visuais de elementos estruturantes da paisagem local</p>
+                    </div>
+                    <div class="territorio-cards-grid">
+                        
+                        <!-- CARTÃO 1 -->
+                        <div class="territorio-card">
+                            <div class="territorio-card-img-wrap">
+                                <img src="img/g1.jpg" alt="Vegetação e margem do Rio Jaguaribe" loading="lazy">
+                            </div>
+                            <div class="territorio-card-body">
+                                <h3>Vegetação e margem do Rio Jaguaribe</h3>
+                                <p>A vegetação marginal contribui para a composição da paisagem e pode ser observada como elemento de leitura do ambiente.</p>
+                            </div>
+                        </div>
+
+                        <!-- CARTÃO 2 -->
+                        <div class="territorio-card">
+                            <div class="territorio-card-img-wrap">
+                                <img src="img/g2.jpg" alt="Vegetação aquática e corpo d'água" loading="lazy">
+                            </div>
+                            <div class="territorio-card-body">
+                                <h3>Vegetação aquática e corpo d'água</h3>
+                                <p>A presença de vegetação aquática constitui um dos elementos que podem ser observados durante a leitura socioambiental do ambiente aquático.</p>
+                            </div>
+                        </div>
+
+                        <!-- CARTÃO 3 -->
+                        <div class="territorio-card">
+                            <div class="territorio-card-img-wrap">
+                                <img src="img/g3.png" alt="Intervenções e dinâmica da água" loading="lazy">
+                            </div>
+                            <div class="territorio-card-body">
+                                <h3>Intervenções e dinâmica da água</h3>
+                                <p>Estruturas construídas podem modificar a paisagem e a dinâmica do ambiente aquático.</p>
+                            </div>
+                        </div>
+
+                        <!-- CARTÃO 4 -->
+                        <div class="territorio-card">
+                            <div class="territorio-card-img-wrap">
+                                <img src="img/g4.png" alt="Rio e paisagem urbana" loading="lazy">
+                            </div>
+                            <div class="territorio-card-body">
+                                <h3>Rio e paisagem urbana</h3>
+                                <p>A proximidade entre o rio e a ocupação urbana evidencia a relação entre o ambiente natural e a organização do território.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO – RIO E CIDADE -->
+            <section class="territorio-section territorio-bg-light">
+                <div class="territorio-container territorio-grid-2">
+                    <div class="territorio-image-block">
+                        <img src="img/rc1.png" alt="Rio e cidade" loading="lazy" class="territorio-img-fluid">
+                    </div>
+                    <div class="territorio-text-block">
+                        <h2>Rio e cidade: relações que formam o território</h2>
+                        <p>
+                            A presença do Rio Jaguaribe influencia e é influenciada pelas formas de ocupação do território. A cidade, as vias de circulação, as áreas construídas, a vegetação e o próprio rio compõem uma paisagem na qual natureza e sociedade estão continuamente relacionadas.
+                        </p>
+                        <div class="territorio-callout-grid">
+                            <div class="territorio-callout-item">
+                                <strong>OBSERVE</strong>
+                                <span>Identifique elementos naturais e construídos presentes na paisagem.</span>
+                            </div>
+                            <div class="territorio-callout-item">
+                                <strong>RELACIONE</strong>
+                                <span>Perceba como as atividades humanas se relacionam com o rio.</span>
+                            </div>
+                            <div class="territorio-callout-item">
+                                <strong>QUESTIONE</strong>
+                                <span>Reflita sobre os desafios e possibilidades de conservação dos recursos hídricos.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO – INTERVENÇÕES NO TERRITÓRIO -->
+            <section class="territorio-section">
+                <div class="territorio-container territorio-grid-2">
+                    <div class="territorio-text-block">
+                        <h2>As marcas da ação humana</h2>
+                        <p>
+                            Pontes, estruturas hidráulicas, ocupação das margens e outras intervenções fazem parte da paisagem do Rio Jaguaribe. Observar essas transformações possibilita discutir como as ações humanas podem modificar as características do ambiente e as relações estabelecidas com a água.
+                        </p>
+                        <div class="territorio-box-checklist">
+                            <h4>Para observar no território</h4>
+                            <ul>
+                                <li>Como estão as margens do rio?</li>
+                                <li>Existe vegetação próxima à água?</li>
+                                <li>Quais estruturas humanas podem ser identificadas?</li>
+                                <li>Como essas estruturas se relacionam com o rio?</li>
+                                <li>Quais situações podem ser utilizadas como temas para atividades educativas?</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="territorio-image-block">
+                        <img src="img/b1.jpg" alt="Intervenções no território" loading="lazy" class="territorio-img-fluid">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO – O TERRITÓRIO COMO ESPAÇO EDUCATIVO -->
+            <section class="territorio-section territorio-bg-light">
+                <div class="territorio-container text-center max-width-800">
+                    <h2>O território como espaço de aprendizagem</h2>
+                    <p class="territorio-lead" style="font-size: 1.1rem; margin-bottom: 20px;">
+                        O território pode constituir um espaço privilegiado para a construção de conhecimentos sobre água, ambiente e sociedade. A observação de situações presentes no cotidiano permite aproximar os conteúdos escolares das características do espaço vivido.
+                    </p>
+                    <p style="color: #475569; margin-bottom: 35px;">
+                        No <strong>Saberes das Águas</strong>, o Rio Jaguaribe é utilizado como referência territorial para contextualizar práticas de Educação Ambiental e Educação Hídrica, articulando observação, reflexão, problematização e aprendizagem.
+                    </p>
+                    
+                    <div class="territorio-fluxo-simples">
+                        <div class="fluxo-step">TERRITÓRIO</div>
+                        <div class="fluxo-arrow">→</div>
+                        <div class="fluxo-step">OBSERVAÇÃO</div>
+                        <div class="fluxo-arrow">→</div>
+                        <div class="fluxo-step">REFLEXÃO</div>
+                        <div class="fluxo-arrow">→</div>
+                        <div class="fluxo-step destaque">APRENDIZAGEM</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VÍDEO DO TERRITÓRIO -->
+            <section class="territorio-section">
+                <div class="territorio-container max-width-800 text-center">
+                    <h2>Conheça o território em imagens</h2>
+                    <p class="territorio-subtitle">Registro videográfico associado à paisagem local</p>
+                    
+                    <div class="territorio-video-wrapper mt-20">
+                        <video controls preload="metadata" width="100%" class="territorio-html5-video">
+                            <source src="img/video1.mp4" type="video/mp4">
+                            Seu navegador não suporta a reprodução de vídeos HTML5.
+                        </video>
+                    </div>
+                    <p class="territorio-video-legenda mt-10">
+                        Imagens do território utilizadas como recurso de contextualização e observação socioambiental.
+                    </p>
+                </div>
+            </section>
+
+            <!-- SEÇÃO FINAL – RELAÇÃO COM O PAR -->
+            <section class="territorio-section territorio-bg-primary text-center">
+                <div class="territorio-container max-width-800">
+                    <h2 style="color: white; border: none; padding: 0;">Do território à prática educativa</h2>
+                    <p style="color: #e2e8f0; font-size: 1.05rem; line-height: 1.7; margin: 20px 0 30px 0;">
+                        A leitura do território constitui uma etapa importante para a contextualização das práticas educativas. A partir das características observadas no ambiente, o PAR Educacional oferece parâmetros que podem orientar a observação, o registro, a interpretação e a discussão de aspectos relacionados às margens, ao corpo d'água e ao entorno.
+                    </p>
+                    <button class="territorio-btn-white" onclick="mudarTela('tela-identificacao')">
+                        Conheça o PAR Educacional →
+                    </button>
+                    
+                    <div style="margin-top: 40px;">
+                        <button class="btn-grande principal" onclick="mudarTela('tela-inicio')" style="max-width: 280px; margin: 0 auto; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                            Voltar ao Início
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- TELA 9: REFERÊNCIAS (Conteúdo Original Restaurado) -->
+    <div id="tela-referencias" class="tela">
+        <div class="container texto-informativo">
+            <h2>Referências Bibliográficas</h2>
+            <ul class="lista-referencias">
+                <li><strong>CALLISTO, M.; FERREIRA, W.; MORENO, P.; GOULART, M. D. C.; PETRUCIO, M.</strong> Aplicação de um protocolo de avaliação rápida da diversidade de habitats em atividades de ensino e pesquisa (MG-RJ). <em>Acta Limnologica Brasiliensia</em>, v. 14, n. 1, p. 91-98, 2002.</li>
+                <li><strong>GUIMARÃES, A.; RODRIGUES, A. S. L.; MALAFAIA, G.</strong> Adequação de um protocolo de avaliação rápida de rios para ser usado por estudantes do ensino fundamental. <em>Ambiente & Água</em>, v. 7, n. 3, p. 241-260, 2012.</li>
+                <li><strong>SOUSA, J. H.; LEAL, M. F.; SANTOS, O.; PACHECO, A. C. L.; SILVA, E. L.; PINHEIRO, T. G.</strong> Uso do Protocolo de Avaliação Rápida (PAR) em rios perenes do semiárido brasileiro. Editora e-Publicar.</li>
+            </ul>
+            <button class="btn-grande principal mt-20" onclick="mudarTela('tela-inicio')">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <!-- TELA 10: TABELA DE CLASSIFICAÇÃO (Conteúdo Original Restaurado) -->
+    <div id="tela-tabela-classificacao" class="tela">
+        <div class="container texto-informativo">
+            <h2>Tabela de Classes e Classificação Ambiental</h2>
+            <p>O protocolo avalia 17 parâmetros. O somatório máximo é de 85 pontos:</p>
+            <table class="tabela-resumo mt-10">
+                <thead><tr><th>Pontuação</th><th>Classificação</th><th>Interpretação Ambiental</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>64 a 85</strong></td><td>Natural / baixa alteração</td><td>Predomínio de características naturais, com pouca evidência de intervenção relevante.</td></tr>
+                    <tr><td><strong>39 a 63</strong></td><td>Alterações reduzidas</td><td>Alterações presentes, sem comprometimento generalizado da estrutura do trecho.</td></tr>
+                    <tr><td><strong>26 a 38</strong></td><td>Alterações moderadas</td><td>Intervenções e/ou alterações ambientais evidentes em parte relevante do trecho.</td></tr>
+                    <tr><td><strong>0 a 25</strong></td><td>Alterações extremas</td><td>Predomínio de alterações intensas e/ou múltiplas pressões antrópicas com forte influência.</td></tr>
+                </tbody>
+            </table>
+            <button class="btn-grande principal mt-20" onclick="mudarTela('tela-inicio')">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="script.js"></script>
+</body>
+</html>
